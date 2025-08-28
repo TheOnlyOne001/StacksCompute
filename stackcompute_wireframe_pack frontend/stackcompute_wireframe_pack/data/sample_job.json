@@ -1,0 +1,9 @@
+{
+  "name": "Inference Quest \u2013 Build Station Chennai",
+  "budget": 500,
+  "token": "STX",
+  "minStake": 10,
+  "commitUntil": "T+2h",
+  "revealUntil": "T+4h",
+  "seedHash": "0xseedhash"
+}

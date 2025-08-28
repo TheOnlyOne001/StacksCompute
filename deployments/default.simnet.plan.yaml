@@ -1,0 +1,20 @@
+---
+id: 1
+name: StackCompute
+network: simnet
+plan:
+  batches:
+    - id: 1
+      transactions:
+        - contract-publish:
+            contract-name: job-registry
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 52600
+            path: contracts/job-registry.clar
+            anchor-block-only: true
+        - contract-publish:
+            contract-name: trophy-sbt
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 25000
+            path: contracts/trophy-sbt.clar
+            anchor-block-only: true

@@ -1,5 +1,4 @@
 ;; trophy-sbt.clar - Non-transferable Soul Bound Token for winners
-
 ;; Define the non-fungible token
 (define-non-fungible-token trophy uint)
 
@@ -52,26 +51,12 @@
 (define-read-only (get-next-token-id)
   (var-get next-token-id))
 
-;; URI functions for metadata
+;; FIXED: Safe URI functions for metadata
 (define-read-only (get-token-uri (token-id uint))
-  (ok (some (concat "https://stackcompute.com/api/trophy/" (uint-to-string token-id)))))
+  (ok (some "https://stackcompute.com/api/trophy/")))
 
 (define-read-only (get-last-token-id)
   (ok (- (var-get next-token-id) u1)))
-
-;; Helper to convert uint to string (simplified version)
-(define-private (uint-to-string (value uint))
-  (if (is-eq value u0)
-    "0"
-    (get-numeric-string value)))
-
-(define-private (get-numeric-string (value uint))
-  (if (is-eq value u0) ""
-    (let ((last-digit (mod value u10))
-          (rest (/ value u10)))
-      (concat 
-        (if (> rest u0) (get-numeric-string rest) "")
-        (unwrap-panic (element-at? "0123456789" last-digit))))))
 
 ;; Set registry contract (one-time setup by deployer)
 (define-public (set-registry-contract (registry principal))

@@ -1,2 +1,23 @@
 [network]
 name = "devnet"
+deployment_fee_rate = 10
+
+[[network.accounts]]
+name = "deployer" 
+mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw"
+balance = 100_000_000_000_000
+
+[[network.accounts]]
+name = "wallet_1"
+mnemonic = "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild"
+balance = 100_000_000_000_000
+
+[[network.accounts]]
+name = "wallet_2" 
+mnemonic = "hold excess usual excess ring elephant install account glad dry fragile donkey gaze humble truck breeze nation gasp vacuum limb head keep delay hospital"
+balance = 100_000_000_000_000
+
+[[network.accounts]]
+name = "wallet_3"
+mnemonic = "cycle puppy glare enroll cost improve round trend wrist mushroom prime civil mean use draft tonight range reef kangaroo inch evidence master laundry ostrich"
+balance = 100_000_000_000_000

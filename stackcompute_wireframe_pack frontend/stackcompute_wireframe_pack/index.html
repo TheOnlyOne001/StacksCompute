@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackCompute – Clickable Wireframe</title>
+<style>
+  :root { --bg:#0f1226; --card:#171a34; --muted:#8f96b3; --accent:#ff7a18; --border:#2a2f55; --text:#e9ecff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; background:var(--bg); color:var(--text); }
+  header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); background:linear-gradient(180deg, rgba(255,122,24,0.08), transparent); }
+  header .brand { font-weight:800; letter-spacing:0.5px; }
+  header .tag { color:var(--muted); font-size:12px; margin-left:8px; }
+  .container { display:flex; min-height: calc(100vh - 60px); }
+  nav { width:260px; border-right:1px solid var(--border); padding:16px; }
+  nav h3 { margin:8px 0 10px; color:#fff; font-size:14px; text-transform:uppercase; letter-spacing:1px; }
+  nav button { width:100%; margin:6px 0; padding:10px 12px; background:#131633; color:var(--text); border:1px solid var(--border); border-radius:8px; text-align:left; cursor:pointer; }
+  nav button.active { outline:2px solid var(--accent); background:#1b1f44; }
+  main { flex:1; padding:20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .row { display:flex; gap:16px; }
+  .col { flex:1; }
+  .muted { color:var(--muted); }
+  .pill { border:1px dashed var(--border); padding:6px 10px; border-radius:999px; font-size:12px; display:inline-block; margin-right:8px; }
+  .btn { background:var(--accent); color:#111; border:none; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:700; }
+  .btn.secondary { background:#2b2f55; color:#fff; border:1px solid var(--border); }
+  .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+  input, select, textarea { width:100%; background:#101330; color:#fff; border:1px solid var(--border); border-radius:8px; padding:10px; }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { border-bottom:1px solid var(--border); padding:8px; text-align:left; }
+  .kbd { background:#0b0e25; border:1px solid var(--border); padding:2px 6px; border-radius:6px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  .wow { background: radial-gradient(800px 200px at 10% 0%, rgba(255,122,24,0.2), transparent); }
+  .tv { font-size:56px; font-weight:800; letter-spacing:1px; text-align:center; }
+  .leader { font-size:18px; }
+  .foot { color:var(--muted); font-size:12px; margin-top:8px; }
+  .inline { display:inline-flex; gap:8px; align-items:center; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <span class="brand">StackCompute</span>
+    <span class="tag">— verifiable compute bounties on Stacks</span>
+  </div>
+  <div class="inline">
+    <span class="pill">Testnet</span>
+    <button class="btn secondary" onclick="fakeConnect()">Connect Wallet</button>
+  </div>
+</header>
+
+<div class="container">
+  <nav>
+    <h3>Wireframe Views</h3>
+    <button onclick="go('home')" id="tab-home" class="active">🏠 Home / Roles</button>
+    <button onclick="go('organizer-create')" id="tab-organizer-create">🛠 Organizer – Create Job</button>
+    <button onclick="go('organizer-dash')" id="tab-organizer-dash">📊 Organizer – Job Dashboard</button>
+    <button onclick="go('worker-register')" id="tab-worker-register">👷 Worker – Register & Stake</button>
+    <button onclick="go('worker-commit')" id="tab-worker-commit">📦 Worker – Commit Result</button>
+    <button onclick="go('worker-reveal')" id="tab-worker-reveal">🔎 Worker – Reveal Samples</button>
+    <button onclick="go('judge-panel')" id="tab-judge-panel">⚖️ Judge/Attestor Panel</button>
+    <button onclick="go('public-job')" id="tab-public-job">🌐 Public Job Page</button>
+    <button onclick="go('tv')" id="tab-tv">📺 Big‑Screen Mode</button>
+    <div class="foot">This is a static prototype meant to guide the build. All numbers and tx links are placeholders.</div>
+  </nav>
+  <main id="view">
+    <!-- Dynamic content injected by JavaScript -->
+  </main>
+</div>
+
+<script>
+  const state = {
+    wallet: null,
+    job: {
+      id: "JOB-" + Math.floor(Math.random()*10000),
+      name: "Inference Quest – Build Station Chennai",
+      budget: 500,
+      token: "STX",
+      stake: 10,
+      commitDeadline: "Today + 2h",
+      revealDeadline: "Today + 4h",
+      seedHash: "0x" + Math.floor(Math.random()*1e16).toString(16).padStart(16,'0'),
+      seedRevealed: false,
+      revealedSeed: null,
+      escrow: 0,
+      workers: [],
+      attestors: ["judge.alice.stx", "mentor.bob.stx"],
+      status: "Created"
+    }
+  };
+
+  function fmt(x){ return typeof x==="number" ? x.toLocaleString() : x; }
+
+  function fakeConnect(){
+    state.wallet = "SP" + Math.floor(Math.random()*1e14).toString(36).toUpperCase();
+    alert("Connected wallet: " + state.wallet);
+    render();
+  }
+
+  function go(key){
+    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+    document.getElementById("tab-"+key).classList.add("active");
+    render(key);
+  }
+
+  function render(key = 'home'){
+    const v = document.getElementById("view");
+    const j = state.job;
+    const header = (title, subtitle="") => `
+      <div class="card wow">
+        <h2 style="margin:0">${title}</h2>
+        ${subtitle ? `<div class="muted" style="margin-top:6px">${subtitle}</div>` : ""}
+      </div>`;
+
+    if(key==='home'){
+      v.innerHTML = `
+        ${header("Welcome to StackCompute", "Pick a role to explore the flow. This prototype highlights the minimum UI we will ship in 24 hours.")}
+        <div class="grid">
+          <div class="card">
+            <h3>Organizer</h3>
+            <p>Create a job, deposit prize escrow, define deadlines, add judges, reveal seed, and settle payouts.</p>
+            <button class="btn" onclick="go('organizer-create')">Create Job</button>
+          </div>
+          <div class="card">
+            <h3>Worker</h3>
+            <p>Register, stake, commit Merkle root of results, reveal samples after seed is revealed, and get paid.</p>
+            <button class="btn" onclick="go('worker-register')">Register for Job</button>
+          </div>
+          <div class="card">
+            <h3>Judge/Attestor</h3>
+            <p>Optionally verify and attest pass/fail for submissions (fallback if sample‑verification is off‑chain).</p>
+            <button class="btn" onclick="go('judge-panel')">Open Panel</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Public Job Page</h3>
+          <p>Transparent scoreboard and payouts with tx links.</p>
+          <button class="btn secondary" onclick="go('public-job')">View Public Page</button>
+        </div>
+      `;
+      return;
+    }
+
+    if(key==='organizer-create'){
+      v.innerHTML = `
+        ${header("Organizer – Create Job", "A single form to define the on‑chain job.")}
+        <div class="row">
+          <div class="col card">
+            <label>Job Name</label>
+            <input value="${j.name}">
+            <label style="margin-top:10px">Budget (${j.token})</label>
+            <input value="${j.budget}">
+            <label style="margin-top:10px">Minimum Worker Stake (${j.token})</label>
+            <input value="${j.stake}">
+            <label style="margin-top:10px">Commit Deadline</label>
+            <input value="${j.commitDeadline}">
+            <label style="margin-top:10px">Reveal Deadline</label>
+            <input value="${j.revealDeadline}">
+          </div>
+          <div class="col card">
+            <label>Seed (commit now, reveal later)</label>
+            <input placeholder="Type a secret..." value="correct‑horsebattery‑staple">
+            <div class="muted" style="margin-top:8px">Committed hash: <span class="kbd">${j.seedHash}</span></div>
+            <label style="margin-top:10px">Attestors (optional)</label>
+            <textarea rows="4">${j.attestors.join(", ")}</textarea>
+            <div style="margin-top:12px" class="inline">
+              <button class="btn" onclick="fakeCreate()">Create & Deploy Contract</button>
+              <button class="btn secondary" onclick="fakeDeposit()">Deposit ${j.budget} ${j.token}</button>
+            </div>
+            <div class="foot">Action calls would open wallet popups in the real app.</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if(key==='organizer-dash'){
+      v.innerHTML = `
+        ${header("Organizer – Job Dashboard", "Everything needed during the event.")}
+        <div class="row">
+          <div class="col card">
+            <div><b>Job</b>: ${j.name} <span class="pill">${j.id}</span></div>
+            <div style="margin-top:6px" class="muted">Status: <b>${j.status}</b> · Escrow: <b>${j.escrow} ${j.token}</b></div>
+            <div style="margin-top:10px" class="inline">
+              <button class="btn secondary" onclick="fakeDeposit()">Top‑up Escrow</button>
+              <button class="btn" onclick="revealSeed()">Reveal Seed</button>
+              <button class="btn secondary" onclick="settle()">Settle & Pay</button>
+            </div>
+          </div>
+          <div class="col card">
+            <h3>Workers</h3>
+            <table>
+              <thead><tr><th>Wallet</th><th>Committed</th><th>Revealed</th><th>Status</th></tr></thead>
+              <tbody id="workers-body"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      const body = document.getElementById("workers-body");
+      body.innerHTML = (j.workers.length? j.workers:[]).map(w => `
+        <tr><td>${w.addr}</td><td>${w.committed? "✔":"—"}</td><td>${w.revealed? "✔":"—"}</td><td>${w.status||"pending"}</td></tr>
+      `).join("") || `<tr><td colspan="4" class="muted">No workers yet.</td></tr>`;
+      return;
+    }
+
+    if(key==='worker-register'){
+      v.innerHTML = `
+        ${header("Worker – Register & Stake", "Join the job and lock a small stake.")}
+        <div class="card">
+          <div class="row">
+            <div class="col">
+              <div>Job: <b>${j.name}</b> <span class="pill">${j.id}</span></div>
+              <div class="muted">Stake required: <b>${j.stake} ${j.token}</b></div>
+            </div>
+            <div class="col" style="text-align:right">
+              <button class="btn" onclick="registerWorker()">Register & Stake</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Registered Workers</h3>
+          <table>
+            <thead><tr><th>Wallet</th><th>Stake</th><th>Status</th></tr></thead>
+            <tbody id="reg-body"></tbody>
+          </table>
+        </div>
+      `;
+      const body = document.getElementById("reg-body");
+      body.innerHTML = (j.workers.length? j.workers:[]).map(w => `
+        <tr><td>${w.addr}</td><td>${j.stake} ${j.token}</td><td>${w.status||"registered"}</td></tr>
+      `).join("") || `<tr><td colspan="3" class="muted">No registrations yet.</td></tr>`;
+      return;
+    }
+
+    if(key==='worker-commit'){
+      v.innerHTML = `
+        ${header("Worker – Commit Result", "Submit the Merkle root / hash of your output.")}
+        <div class="card">
+          <label>Your result root (hash)</label>
+          <input id="root" placeholder="0xmerkleRoot">
+          <div style="margin-top:10px"><button class="btn" onclick="commitResult()">Commit</button></div>
+          <div class="foot">This writes a <span class="kbd">commit-result</span> tx on‑chain.</div>
+        </div>
+      `;
+      return;
+    }
+
+    if(key==='worker-reveal'){
+      v.innerHTML = `
+        ${header("Worker – Reveal Samples", j.seedRevealed? "Seed is revealed. Upload your sample outputs for verification." : "Waiting for seed reveal by organizer…")}
+        <div class="card">
+          <label>Sample outputs (JSON)</label>
+          <textarea rows="6" placeholder='{"idx":123,"pred":7} ...'></textarea>
+          <div style="margin-top:10px"><button class="btn" ${j.seedRevealed? "" : "disabled"} onclick="revealSamples()">Reveal</button></div>
+          <div class="foot">This writes a <span class="kbd">reveal-samples</span> tx and flags you for payout if valid.</div>
+        </div>
+      `;
+      return;
+    }
+
+    if(key==='judge-panel'){
+      v.innerHTML = `
+        ${header("Judge/Attestor Panel", "Optional fallback path: attest pass/fail for submissions.")}
+        <div class="card">
+          <table>
+            <thead><tr><th>Worker</th><th>Committed</th><th>Revealed</th><th>Attest</th></tr></thead>
+            <tbody id="attest-body"></tbody>
+          </table>
+        </div>
+      `;
+      const body = document.getElementById("attest-body");
+      body.innerHTML = (j.workers.length? j.workers:[]).map((w,i) => `
+        <tr><td>${w.addr}</td><td>${w.committed? "✔":"—"}</td><td>${w.revealed? "✔":"—"}</td>
+        <td><button class="btn secondary" onclick="attest(${i}, true)">Pass</button> <button class="btn secondary" onclick="attest(${i}, false)">Fail</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="4" class="muted">No submissions yet.</td></tr>`;
+      return;
+    }
+
+    if(key==='public-job'){
+      v.innerHTML = `
+        ${header("Public Job Page", "Transparent progress & payouts (auditable).")}
+        <div class="row">
+          <div class="col card">
+            <div><b>${j.name}</b> <span class="pill">${j.id}</span></div>
+            <div class="muted">Budget: ${j.budget} ${j.token} · Escrow: ${j.escrow}</div>
+            <div class="muted">Commit deadline: ${j.commitDeadline} · Reveal deadline: ${j.revealDeadline}</div>
+            <div class="muted">Seed: ${j.seedRevealed ? "<b>revealed</b>" : "committed"} (${j.seedHash})</div>
+          </div>
+          <div class="col card">
+            <h3>Scoreboard</h3>
+            <table class="leader">
+              <thead><tr><th>#</th><th>Worker</th><th>Status</th><th>Payout</th></tr></thead>
+              <tbody id="score-body"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      const body = document.getElementById("score-body");
+      const rows = (j.workers||[]).map((w,idx)=> `<tr><td>${idx+1}</td><td>${w.addr}</td><td>${w.status||"—"}</td><td>${w.payout? (w.payout+" "+j.token) : "—"}</td></tr>`).join("");
+      body.innerHTML = rows || `<tr><td colspan="4" class="muted">No payouts yet.</td></tr>`;
+      return;
+    }
+
+    if(key==='tv'){
+      v.innerHTML = `
+        <div class="card wow tv">
+          <div>🏆 StackCompute Winners</div>
+          <div style="font-size:20px" class="muted">Live on Stacks testnet</div>
+        </div>
+        <div class="card">
+          <table class="leader">
+            <thead><tr><th>Rank</th><th>Worker</th><th>Payout</th><th>Tx</th></tr></thead>
+            <tbody id="tv-body"></tbody>
+          </table>
+        </div>
+      `;
+      const body = document.getElementById("tv-body");
+      const rows = (state.job.workers||[]).filter(w=>w.payout).sort((a,b)=>b.payout-a.payout).map((w,i)=>`
+        <tr><td>${i+1}</td><td>${w.addr}</td><td>${w.payout} ${j.token}</td><td><span class="kbd">0xFAKE${i}…</span></td></tr>
+      `).join("");
+      body.innerHTML = rows || `<tr><td colspan="4" class="muted">Run Settle to see winners.</td></tr>`;
+      return;
+    }
+
+  } // render end
+
+  function fakeCreate(){
+    state.job.status = "Deployed";
+    render('organizer-dash');
+  }
+  function fakeDeposit(){
+    state.job.escrow += state.job.budget;
+    state.job.status = "Funded";
+    render('organizer-dash');
+  }
+  function registerWorker(){
+    const addr = state.wallet || ("SP" + Math.floor(Math.random()*1e14).toString(36).toUpperCase());
+    state.job.workers.push({addr, committed:false, revealed:false, status:"registered"});
+    render('worker-register');
+  }
+  function commitResult(){
+    const w = state.job.workers[0] || {addr: state.wallet || "SPTEST"};
+    w.committed = true;
+    w.status = "committed";
+    render('organizer-dash');
+  }
+  function revealSeed(){
+    state.job.seedRevealed = true;
+    state.job.revealedSeed = "s3cr3t-"+Math.floor(Math.random()*1000);
+    state.job.status = "Reveal in progress";
+    alert("Seed revealed! Challenge indices derived on-chain in the real app.");
+    render('organizer-dash');
+  }
+  function revealSamples(){
+    const w = state.job.workers[0]; if(!w) return;
+    w.revealed = true; w.status = "revealed";
+    render('organizer-dash');
+  }
+  function attest(i, pass){
+    const w = state.job.workers[i];
+    if(!w) return;
+    w.status = pass? "attested ✅" : "failed ❌";
+    render('judge-panel');
+  }
+  function settle(){
+    const winners = state.job.workers.filter(w => w.revealed || (w.status||'').includes("attested"));
+    if(!winners.length){ alert("No valid workers to pay."); return; }
+    const share = Math.floor((state.job.escrow) / winners.length);
+    winners.forEach(w => w.payout = share);
+    state.job.status = "Settled";
+    alert("Settled! Payouts assigned in this prototype.");
+    render('public-job');
+  }
+
+  // Initial render
+  render();
+</script>
+</body>
+</html>
