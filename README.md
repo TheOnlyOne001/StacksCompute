@@ -1,6 +1,6 @@
 # StackCompute — Verifiable Compute Bounties on Stacks
 
-**StackCompute** is a marketplace-style dapp where renters post compute jobs, providers commit results, and the **first valid claim** auto-pays from on-chain escrow. Verification uses a **commit → reveal → sampled proof** flow with **Merkle branches**. Winners receive a **non-transferable Trophy SBT**.
+**StackCompute** is a marketplace-style dapp where renters post compute jobs, providers commit results, and the **first valid claim** auto-pays from on-chain escrow. Verification uses a **commit → reveal → sampled proof** flow with **Merkle branches**. Reputational Providers receive a **non-transferable Trophy SBT**.
 
  **Autopay in one tx:** verification + payout + SBT mint inside `claim`
  **Deterministic fairness:** commit-reveal seed → contract derives challenge indices
@@ -216,7 +216,7 @@ pnpm --filter app dev
 
 ---
 
-## Post-conditions (attach from UI)
+## Post-conditions
 
 * On `claim`/`finalize`: **From contract principal** transfer **≤ budget**.
 * On `fund`: optional post-condition for exact deposit amount.
@@ -242,18 +242,6 @@ pnpm --filter app dev
 
 ---
 
-## Troubleshooting Deploy (quick table)
-
-| Symptom                   | Fix                                                                                                                                         |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ContractAlreadyExists** | Deploy under a fresh name (e.g., `…-v1a`), update `.env.local`.                                                                             |
-| **Analysis/Type error**   | Run `clarinet check`; fix `buff` lengths, list sizes, or missing view funcs. Avoid hard-coding external principals—pass via storage/params. |
-| **FeeTooLow / OutOfGas**  | Pick **High** fee in Explorer; larger contracts need more fee.                                                                              |
-| **BadNonce / PendingTx**  | Check mempool; wait or rebroadcast with higher fee (same nonce).                                                                            |
-| **InsufficientFunds**     | Refill Testnet STX for deployer.                                                                                                            |
-| **Network mismatch**      | Ensure Leather **Testnet**, Explorer **Testnet**, and names match exactly.                                                                  |
-
----
 
 ## Scripts & Testing
 
