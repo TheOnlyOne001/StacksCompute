@@ -23,27 +23,30 @@
 
 ```mermaid
 flowchart LR
-  subgraph ClientApp[Client App (Next.js)]
-    UI[Marketplace + Consoles + TV]
-    Sampler[sampler.ts (derive challenge indices)]
-    Merkle[merkle.ts (root + proofs)]
-    SC[Stacks Connect (Leather)]
+  %% Client App subgraph
+  subgraph ClientApp["Client App (Next.js)"]
+    UI["Marketplace · Consoles · TV"]
+    Sampler["sampler.ts (derive indices)"]
+    Merkle["merkle.ts (root & proofs)"]
+    SC["Stacks Connect (Leather)"]
     UI --> SC
     UI --> Sampler
     UI --> Merkle
   end
 
-  SC --> CL[Stacks Network (testnet)]
-  CL --> JR[(job-registry.clar)]
-  CL --> SBT[(trophy-sbt.clar)]
+  %% Chain
+  SC --> CL["Stacks Network (testnet)"]
+  CL --> JR["job-registry.clar"]
+  CL --> SBT["trophy-sbt.clar"]
 
-  subgraph Offchain[Off-chain Compute (Provider)]
-    D[data/sample_inputs.json]
-    P[Deterministic compute in browser/CLI]
+  %% Off-chain Provider subgraph
+  subgraph Offchain["Off-chain Compute (Provider)"]
+    D["data/sample_inputs.json"]
+    P["Deterministic compute (browser/CLI)"]
+    D --> P
     P --> Merkle
   end
 
-  D --> P
   P --> UI
 ```
 
