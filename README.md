@@ -23,17 +23,21 @@
 
 ```mermaid
 flowchart LR
-  subgraph Client App (Next.js)
-    UI[Marketplace + Consoles + TV] --> SC[Stacks Connect (Leather)]
-    UI --> Sampler[sampler.ts (derive challenge indices)]
-    UI --> Merkle[merkle.ts (root + proofs)]
+  subgraph ClientApp[Client App (Next.js)]
+    UI[Marketplace + Consoles + TV]
+    Sampler[sampler.ts (derive challenge indices)]
+    Merkle[merkle.ts (root + proofs)]
+    SC[Stacks Connect (Leather)]
+    UI --> SC
+    UI --> Sampler
+    UI --> Merkle
   end
 
   SC --> CL[Stacks Network (testnet)]
   CL --> JR[(job-registry.clar)]
   CL --> SBT[(trophy-sbt.clar)]
 
-  subgraph Off-chain Compute (Provider)
+  subgraph Offchain[Off-chain Compute (Provider)]
     D[data/sample_inputs.json]
     P[Deterministic compute in browser/CLI]
     P --> Merkle
