@@ -1,7 +1,3 @@
-Below is a complete `README.md` you can drop at the repo root. It reflects the **autopay** design, **Merkle proof** format, **challenge index derivation**, Leather integration, and a 24-hour build/run workflow.
-
----
-
 # StackCompute — Verifiable Compute Bounties on Stacks
 
 **StackCompute** is a marketplace-style dapp where renters post compute jobs, providers commit results, and the **first valid claim** auto-pays from on-chain escrow. Verification uses a **commit → reveal → sampled proof** flow with **Merkle branches**. Winners receive a **non-transferable Trophy SBT**.
@@ -13,7 +9,7 @@ Below is a complete `README.md` you can drop at the repo root. It reflects the *
 
 ---
 
-## TL;DR (demo)
+## Flow
 
 1. Renter **creates** job (with seed hash) and **funds** escrow.
 2. Provider **registers & stakes**, **computes** locally, **commits** Merkle root.
